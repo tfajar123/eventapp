@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-// import 'package:path/path.dart' as path;
 
 import '../providers/event_provider.dart';
 import '../models/event.dart';
@@ -28,6 +27,8 @@ class _EventFormScreenState extends State<EventFormScreen> {
   late String? _timeEnd;
   File? _imageFile;
 
+  final TextEditingController _dateController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +40,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
       _image = widget.event!.image;
       _timeStart = widget.event!.timeStart;
       _timeEnd = widget.event!.timeEnd;
+      _dateController.text = _date;
     } else {
       _name = '';
       _description = '';
@@ -47,7 +49,14 @@ class _EventFormScreenState extends State<EventFormScreen> {
       _image = '';
       _timeStart = null;
       _timeEnd = null;
+      _dateController.text = '';
     }
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickImage() async {
@@ -89,12 +98,27 @@ class _EventFormScreenState extends State<EventFormScreen> {
     );
     if (picked != null) {
       setState(() {
-        final formattedTime = picked.format(context);
+        final formattedTime = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
         if (isStart) {
           _timeStart = formattedTime;
         } else {
           _timeEnd = formattedTime;
         }
+      });
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _date.isNotEmpty ? DateTime.parse(_date) : DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        _date = picked.toIso8601String().split('T').first;
+        _dateController.text = _date;
       });
     }
   }
@@ -118,9 +142,13 @@ class _EventFormScreenState extends State<EventFormScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
+                SizedBox(height: 10),
                 TextFormField(
                   initialValue: _name,
-                  decoration: InputDecoration(labelText: 'Name'),
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(),
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please provide a name.';
@@ -131,9 +159,13 @@ class _EventFormScreenState extends State<EventFormScreen> {
                     _name = value!;
                   },
                 ),
+                SizedBox(height: 10),
                 TextFormField(
                   initialValue: _description,
-                  decoration: InputDecoration(labelText: 'Description'),
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(),
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please provide a description.';
@@ -144,22 +176,35 @@ class _EventFormScreenState extends State<EventFormScreen> {
                     _description = value!;
                   },
                 ),
-                TextFormField(
-                  initialValue: _date,
-                  decoration: InputDecoration(labelText: 'Date'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please provide a date.';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _date = value!;
-                  },
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () => _selectDate(context),
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      controller: _dateController,
+                      decoration: InputDecoration(
+                        labelText: 'Date',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please provide a date.';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _date = value!;
+                      },
+                    ),
+                  ),
                 ),
+                SizedBox(height: 10),
                 TextFormField(
                   initialValue: _location,
-                  decoration: InputDecoration(labelText: 'Location'),
+                  decoration: InputDecoration(
+                    labelText: 'Location',
+                    border: OutlineInputBorder(),
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please provide a location.';
@@ -170,33 +215,72 @@ class _EventFormScreenState extends State<EventFormScreen> {
                     _location = value!;
                   },
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Start Time: ${_timeStart ?? 'Not selected'}'),
-                    ElevatedButton(
+                SizedBox(height: 10),
+                TextFormField(
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: 'Start Time',
+                    border: OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.access_time),
                       onPressed: () => _selectTime(context, true),
-                      child: Text('Select Start Time'),
                     ),
-                  ],
+                  ),
+                  controller: TextEditingController(
+                    text: _timeStart ?? 'Not selected',
+                  ),
+                  validator: (value) {
+                    if (_timeStart == null || _timeStart!.isEmpty) {
+                      return 'Please select a start time.';
+                    }
+                    return null;
+                  },
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('End Time: ${_timeEnd ?? 'Not selected'}'),
-                    ElevatedButton(
+                SizedBox(height: 10),
+                TextFormField(
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: 'End Time',
+                    border: OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.access_time),
                       onPressed: () => _selectTime(context, false),
-                      child: Text('Select End Time'),
                     ),
-                  ],
+                  ),
+                  controller: TextEditingController(
+                    text: _timeEnd ?? 'Not selected',
+                  ),
+                  validator: (value) {
+                    if (_timeEnd == null || _timeEnd!.isEmpty) {
+                      return 'Please select an end time.';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 10),
                 _imageFile == null
                     ? Text('No image selected.')
                     : Image.file(_imageFile!, height: 100),
-                ElevatedButton(
-                  onPressed: _pickImage,
-                  child: Text('Pick Image'),
+                SizedBox(height: 10),
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Pick Image',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

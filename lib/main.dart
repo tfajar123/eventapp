@@ -3,6 +3,8 @@
 // import 'package:event_app/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
+// import 'package:intl/intl.dart';
 
 import 'providers/auth_provider.dart';
 import 'providers/event_provider.dart';
@@ -10,6 +12,8 @@ import 'screens/event_list_screen.dart';
 import 'screens/auth_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  initializeDateFormatting('id_ID', null);
   runApp(MyApp());
 }
 
