@@ -19,8 +19,10 @@ class EventProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchEvents() async {
-    final url = Uri.parse('http://192.168.100.65:8000/api/events');
+  Future<void> fetchEvents(bool allEvent) async {
+    final url = _authToken != null && allEvent == false
+        ? Uri.parse('http://192.168.100.65:8000/api/events')
+        : Uri.parse('http://192.168.100.65:8000/api/event');
     final response = await http.get(
       url,
       headers: {'Authorization': 'Bearer $_authToken'},

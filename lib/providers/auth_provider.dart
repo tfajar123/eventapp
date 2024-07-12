@@ -1,5 +1,6 @@
 // lib/providers/auth_provider.dart
 
+import 'package:event_app/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -53,18 +54,22 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
-    final url = Uri.parse('http://192.168.100.65:8000/api/logout');
-    final response = await http.post(
-      url,
-      headers: {'Authorization': 'Bearer $_token'},
-    );
+  Future<void> logout(BuildContext context) async {
+  final url = Uri.parse('http://192.168.100.65:8000/api/logout');
+  final response = await http.post(
+    url,
+    headers: {'Authorization': 'Bearer $_token'},
+  );
 
-    if (response.statusCode == 200) {
-      _token = null;
-      notifyListeners();
-    } else {
-      throw Exception('Failed to logout');
-    }
+  if (response.statusCode == 200) {
+    _token = null;
+    notifyListeners();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => AuthScreen()), // or RegisterScreen()
+    );
+  } else {
+    throw Exception('Failed to logout');
   }
+}
 }
