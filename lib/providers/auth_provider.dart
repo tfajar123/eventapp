@@ -5,13 +5,34 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class AuthProvider with ChangeNotifier {
   String? _token;
   String? get token {
     return _token;
   }
+
   bool get isAuth {
     return _token != null;
+  }
+  
+  AuthProvider() {
+    _retrieveToken();
+  }
+
+  Future<void> _storeToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+  }
+
+  Future<void> _retrieveToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    if (token!= null) {
+      _token = token;
+      notifyListeners();
+    }
   }
 
   Future<void> register(String name, String email, String password) async {
@@ -29,6 +50,7 @@ class AuthProvider with ChangeNotifier {
 
     if (response.statusCode == 201) {
       _token = json.decode(response.body)['token'];
+      await _storeToken(_token!);
       notifyListeners();
     } else {
       throw Exception('Failed to register');
@@ -48,6 +70,7 @@ class AuthProvider with ChangeNotifier {
 
     if (response.statusCode == 200) {
       _token = json.decode(response.body)['token'];
+      await _storeToken(_token!);
       notifyListeners();
     } else {
       throw Exception('Failed to login');
@@ -55,21 +78,24 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout(BuildContext context) async {
-  final url = Uri.parse('http://192.168.100.65:8000/api/logout');
-  final response = await http.post(
-    url,
-    headers: {'Authorization': 'Bearer $_token'},
-  );
-
-  if (response.statusCode == 200) {
-    _token = null;
-    notifyListeners();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => AuthScreen()), // or RegisterScreen()
+    final url = Uri.parse('http://192.168.100.65:8000/api/logout');
+    final response = await http.post(
+      url,
+      headers: {'Authorization': 'Bearer $_token'},
     );
-  } else {
-    throw Exception('Failed to logout');
+
+    if (response.statusCode == 200) {
+      _token = null;
+      await _storeToken(''); 
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      notifyListeners();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => AuthScreen()),
+      );
+    } else {
+      throw Exception('Failed to logout');
+    }
   }
-}
 }

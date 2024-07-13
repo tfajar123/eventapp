@@ -96,6 +96,7 @@ class _EventListScreenState extends State<EventListScreen> {
 // MyEventScreen class
 class MyEventScreen extends StatelessWidget {
   final bool allEvent = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,7 +163,7 @@ class MyEventScreen extends StatelessWidget {
                                 top: 10,
                                 left: 20,
                                 child: Container(
-                                  height: 150,
+                                  height: 180,
                                   width:
                                       MediaQuery.of(context).size.width - 250,
                                   child: Column(
@@ -178,9 +179,8 @@ class MyEventScreen extends StatelessWidget {
                                           color:
                                               Color.fromARGB(255, 82, 3, 135),
                                         ),
-                                        overflow: TextOverflow
-                                            .ellipsis, // Add this line
-                                        maxLines: 1, // Add this line
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
                                       ),
                                       Divider(endIndent: 30),
                                       Row(
@@ -190,7 +190,6 @@ class MyEventScreen extends StatelessWidget {
                                                   121, 55, 55, 55),
                                               size: 20),
                                           Expanded(
-                                            // Wrap the Text widget with Expanded
                                             child: Text(
                                               ' ${event.timeStart ?? ''} - ${event.timeEnd ?? ''}',
                                               style: TextStyle(
@@ -211,7 +210,6 @@ class MyEventScreen extends StatelessWidget {
                                                   121, 55, 55, 55),
                                               size: 20),
                                           Expanded(
-                                            // Wrap the Text widget with Expanded
                                             child: Text(
                                               ' ' +
                                                   event.location.toUpperCase(),
@@ -223,6 +221,62 @@ class MyEventScreen extends StatelessWidget {
                                               overflow: TextOverflow.ellipsis,
                                               maxLines: 2,
                                             ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 15),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(Icons.edit,
+                                                color: Color.fromARGB(
+                                                    255, 82, 3, 135)),
+                                            onPressed: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (ctx) =>
+                                                      EventFormScreen(
+                                                    event: event,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                          IconButton(
+                                            icon: Icon(Icons.delete,
+                                                color: Colors.red),
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (ctx) => AlertDialog(
+                                                  title: Text('Confirm Delete'),
+                                                  content: Text(
+                                                      'Are you sure you want to delete this event?'),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      child: Text('Cancel'),
+                                                      onPressed: () {
+                                                        Navigator.of(ctx)
+                                                            .pop();
+                                                      },
+                                                    ),
+                                                    TextButton(
+                                                      child: Text('Delete'),
+                                                      onPressed: () {
+                                                        Provider.of<EventProvider>(
+                                                                context,
+                                                                listen: false)
+                                                            .deleteEvent(
+                                                                event.id);
+                                                        Navigator.of(ctx).pop();
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ],
                                       ),
