@@ -292,7 +292,7 @@ class MyEventScreen extends StatelessWidget {
                                   height: 180,
                                   child: CachedNetworkImage(
                                     imageUrl:
-                                        'http://192.168.100.65:8000/images/${event.image}',
+                                        'http://54.253.6.75/images/${event.image}',
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) =>
                                         CircularProgressIndicator(),
@@ -551,7 +551,7 @@ class HomeScreen extends StatelessWidget {
                                 height: 180,
                                 child: CachedNetworkImage(
                                   imageUrl:
-                                      'http://192.168.100.65:8000/images/${event.image}',
+                                      'http://54.253.6.75/images/${event.image}',
                                   fit: BoxFit.cover,
                                   placeholder: (context, url) =>
                                       CircularProgressIndicator(),

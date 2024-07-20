@@ -36,7 +36,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> register(String name, String email, String password) async {
-    final url = Uri.parse('http://192.168.100.65:8000/api/register');
+    final url = Uri.parse('http://54.253.6.75/api/register');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -58,7 +58,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> login(String email, String password) async {
-    final url = Uri.parse('http://192.168.100.65:8000/api/login');
+    final url = Uri.parse('http://54.253.6.75/api/login');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -78,7 +78,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout(BuildContext context) async {
-    final url = Uri.parse('http://192.168.100.65:8000/api/logout');
+    final url = Uri.parse('http://54.253.6.75/api/logout');
     final response = await http.post(
       url,
       headers: {'Authorization': 'Bearer $_token'},

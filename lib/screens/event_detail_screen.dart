@@ -14,7 +14,7 @@ class EventDetailScreen extends StatelessWidget {
       body: Stack(
         children: [
           CachedNetworkImage(
-            imageUrl: 'http://192.168.100.65:8000/images/${event.image}',
+            imageUrl: 'http://54.253.6.75/images/${event.image}',
             fit: BoxFit.cover,
             width: double.infinity,
             height: 300,

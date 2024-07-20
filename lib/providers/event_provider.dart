@@ -21,8 +21,8 @@ class EventProvider with ChangeNotifier {
 
   Future<void> fetchEvents(bool allEvent) async {
     final url = _authToken != null && allEvent == false
-        ? Uri.parse('http://192.168.100.65:8000/api/events')
-        : Uri.parse('http://192.168.100.65:8000/api/event');
+        ? Uri.parse('http://54.253.6.75/api/events')
+        : Uri.parse('http://54.253.6.75/api/event');
     final response = await http.get(
       url,
       headers: {'Authorization': 'Bearer $_authToken'},
@@ -34,7 +34,7 @@ class EventProvider with ChangeNotifier {
   }
 
   Future<void> addEvent(Event event, File? imageFile) async {
-    final url = Uri.parse('http://192.168.100.65:8000/api/events');
+    final url = Uri.parse('http://54.253.6.75/api/events');
     
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $_authToken';
@@ -69,7 +69,7 @@ class EventProvider with ChangeNotifier {
   }
 
   Future<void> updateEvent(Event event, File? imageFile) async {
-    final url = Uri.parse('http://192.168.100.65:8000/api/events/${event.id}');
+    final url = Uri.parse('http://54.253.6.75/api/events/${event.id}');
     
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $_authToken';
@@ -107,7 +107,7 @@ class EventProvider with ChangeNotifier {
   }
 
   Future<void> deleteEvent(int id) async {
-    final url = Uri.parse('http://192.168.100.65:8000/api/events/$id');
+    final url = Uri.parse('http://54.253.6.75/api/events/$id');
     await http.delete(
       url,
       headers: {'Authorization': 'Bearer $_authToken'},
