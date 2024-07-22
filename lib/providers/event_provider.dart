@@ -8,10 +8,15 @@ import 'package:path/path.dart' as path;
 
 class EventProvider with ChangeNotifier {
   List<Event> _events = [];
+  List<Event> _searchResults = [];
   String? _authToken;
 
   List<Event> get events {
     return [..._events];
+  }
+
+  List<Event> get searchResults {
+    return [..._searchResults];
   }
 
   void update(String? token) {
@@ -31,6 +36,19 @@ class EventProvider with ChangeNotifier {
     final extractedData = json.decode(response.body) as List;
     _events = extractedData.map((eventData) => Event.fromJson(eventData)).toList();
     notifyListeners();
+  }
+
+  Future<void> searchEvents(String query) async {
+    final url = Uri.parse('http://54.253.6.75/api/event/search?query=$query');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final extractedData = json.decode(response.body) as List;
+      _searchResults = extractedData.map((eventData) => Event.fromJson(eventData)).toList();
+      notifyListeners();
+    } else {
+      throw Exception('Failed to load events');
+    }
   }
 
   Future<void> addEvent(Event event, File? imageFile) async {
